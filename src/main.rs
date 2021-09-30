@@ -34,20 +34,21 @@ fn unescaped(stdin: &str) {
 }
 
 fn escaped(stdin: &str) {
-    let mut iter = stdin.chars().peekable();
+    let mut iter = stdin.chars();
     let mut out = String::new();
     while let Some(next) = iter.next() {
         match next {
             '\\' => {
-                if iter.peek() == Some(&'r')
-                    && iter.peek() == Some(&'\\')
-                    && iter.peek() == Some(&'n')
-                {
-                    for _ in 0..3 {
-                        let _ = iter.next();
-                    }
-                    out.push('\\');
+                out.push('\\');
+                let upcoming = [iter.next(), iter.next(), iter.next()];
+                if upcoming.eq(&[Some('r'), Some('\\'), Some('n')]) {
                     out.push('n');
+                } else {
+                    for c in upcoming {
+                        if let Some(c) = c {
+                            out.push(c);
+                        }
+                    }
                 }
             }
             c => out.push(c),
